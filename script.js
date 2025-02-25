@@ -1,4 +1,4 @@
-let price = 5;
+let price = 2.77;
 let cid = [
   ['PENNY', 1.01],
   ['NICKEL', 2.05],
@@ -25,16 +25,15 @@ const moneyValue = {
 
 const calcFaceValue = (currentPrice) => {
   const values = Object.values(moneyValue);
-  const faceValue = [];
+  let faceValue = [];
   for(i = cid.length - 1; i >= 0; i--){
-    if(currentPrice <= 0){
-      return faceValue;
-    } else if(currentPrice >= values[i]){
+    if(currentPrice >= values[i]){
       Math.round((currentPrice -= values[i]) * 100) / 100;
       faceValue.push(values[i]);
       i++;
     } 
   }
+  return faceValue;
 };
 
 console.log(calcFaceValue(price));
