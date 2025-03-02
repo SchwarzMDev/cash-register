@@ -96,6 +96,12 @@ const deleteData = () => {
   cashInDrawer.innerHTML = ``;
 }
 
+const printCid = () => {
+  for(i = 0; i < cid.length; i++){
+    cashInDrawer.innerHTML += `<div>${cid[i][0]}: ${cid[i][1]}</div>`;
+    }
+}
+
 const updateCid = () => {
   const namedChange = associateChange();
   namedChange.forEach(el => {
@@ -105,15 +111,15 @@ const updateCid = () => {
       }
     }
   })
-  for(i = 0; i < cid.length; i++){
-    cashInDrawer.innerHTML += `<div>${cid[i][0]}: ${cid[i][1]}</div>`;
-    }
 }
+
+printCid();
 
 purchaseBtn.addEventListener("click", () => {
   deleteData();
   getUserInput();
   printChange();
   updateCid();
+  printCid();
 })
 
