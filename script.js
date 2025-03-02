@@ -1,9 +1,10 @@
 const purchaseBtn = document.querySelector("#purchase-btn");
 const userInput = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due");
+const cashInDrawer = document.querySelector("#cid");
 
 let costumerPaidWith;
-let price = 3;
+let price = 3.24;
 let cid = [
   ['PENNY', 1.01],
   ['NICKEL', 2.05],
@@ -25,7 +26,7 @@ const moneyValue = {
   FIVE: 5,
   TEN: 10,
   TWENTY: 20,
-  HUNDRED: 100
+  'ONE HUNDRED': 100
 };
 const moneyKeys = Object.keys(moneyValue);
 const moneyValues = Object.values(moneyValue);
@@ -85,18 +86,34 @@ const associateChange = () => {
 const printChange = () => {
   const namedChange = associateChange();
   namedChange.forEach(element => {
-    changeDue.innerHTML += `<div>${element[0]}: ${element[1]}<div>`;
+    changeDue.innerHTML += `<div>${element[0]}: ${element[1]}</div>`;
   });
 }
 
 const deleteData = () => {
   costumerPaidWith = 0;
   changeDue.innerHTML = ``;
+  cashInDrawer.innerHTML = ``;
+}
+
+const updateCid = () => {
+  const namedChange = associateChange();
+  namedChange.forEach(el => {
+    for(i = 0; i < cid.length; i++){
+      if(el[0] === cid[i][0]){
+        cid[i][1] = Math.round((cid[i][1] - el[1]) * 100) / 100;
+      }
+    }
+  })
+  for(i = 0; i < cid.length; i++){
+    cashInDrawer.innerHTML += `<div>${cid[i][0]}: ${cid[i][1]}</div>`;
+    }
 }
 
 purchaseBtn.addEventListener("click", () => {
   deleteData();
   getUserInput();
   printChange();
+  updateCid();
 })
 
