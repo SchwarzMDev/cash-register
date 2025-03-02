@@ -2,7 +2,7 @@ const purchaseBtn = document.querySelector("#purchase-btn");
 const userInput = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due");
 
-let customerPaidWith;
+let costumerPaidWith;
 let price = 3;
 let cid = [
   ['PENNY', 1.01],
@@ -32,16 +32,18 @@ const moneyValues = Object.values(moneyValue);
 
 // look out for negative input!!
 const getUserInput = () => {
-  return customerPaidWith = userInput.value;
+  return costumerPaidWith = userInput.value;
 }
 
 const calcFaceValue = () => {
   const costumerPaidWith = getUserInput();
+  console.log(costumerPaidWith);
   let change = costumerPaidWith - price;
   const faceValues = [];
   for(i = cid.length - 1; i >= 0; i--){
     if(change >= moneyValues[i]){
-      Math.round((change -= moneyValues[i]) * 100) / 100;
+      change = Math.round((change - moneyValues[i]) * 100) / 100;
+      console.log(change);
       faceValues.push(moneyValues[i]);
       i++;
     } 
@@ -87,7 +89,13 @@ const printChange = () => {
   });
 }
 
+const deleteData = () => {
+  costumerPaidWith = 0;
+  changeDue.innerHTML = ``;
+}
+
 purchaseBtn.addEventListener("click", () => {
+  deleteData();
   getUserInput();
   printChange();
 })
