@@ -2,7 +2,8 @@ const purchaseBtn = document.querySelector("#purchase-btn");
 const userInput = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due");
 
-let price;
+let customerPaidWith;
+let price = 3;
 let cid = [
   ['PENNY', 1.01],
   ['NICKEL', 2.05],
@@ -31,15 +32,16 @@ const moneyValues = Object.values(moneyValue);
 
 // look out for negative input!!
 const getUserInput = () => {
-  price = userInput.value;
-  return price;
+  return customerPaidWith = userInput.value;
 }
 
-const calcFaceValue = (currentPrice) => {
+const calcFaceValue = () => {
+  const costumerPaidWith = getUserInput();
+  let change = costumerPaidWith - price;
   const faceValues = [];
   for(i = cid.length - 1; i >= 0; i--){
-    if(currentPrice >= moneyValues[i]){
-      Math.round((currentPrice -= moneyValues[i]) * 100) / 100;
+    if(change >= moneyValues[i]){
+      Math.round((change -= moneyValues[i]) * 100) / 100;
       faceValues.push(moneyValues[i]);
       i++;
     } 
@@ -48,7 +50,7 @@ const calcFaceValue = (currentPrice) => {
 }
 
 const addEqualFaceValues = () => {
-  const faceValues = calcFaceValue(price);
+  const faceValues = calcFaceValue();
   const change = faceValues.reduce((accumulator, faceValue) => {
     accumulator[faceValue] = (accumulator[faceValue] || 0) + faceValue;
     return accumulator;
@@ -65,13 +67,12 @@ const sortChange = () => {
 const associateChange = () => {
   const sortedChange = sortChange();
   console.log(sortedChange);
-  const namedChange = sortedChange.map((value, index) => {
+  const namedChange = sortedChange.map((value) => {
     const newArray = [];
     for(i = 0; i < moneyValues.length; i++){
       if(value[0] === JSON.stringify(moneyValues[i])){
         newArray.push(moneyKeys[i]);
         newArray.push(value[1]);
-        //newObj[moneyKeys[i]] = value[1];
       }
     }
     return newArray;
