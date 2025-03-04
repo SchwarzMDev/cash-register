@@ -3,8 +3,10 @@ const userInput = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due");
 const cashInDrawer = document.querySelector("#cid");
 
+let drawerStatus;
+let totalChange;
 let costumerPaidWith;
-let price = 3.24;
+let price = 0;
 let cid = [
   ['PENNY', 1.01],
   ['NICKEL', 2.05],
@@ -30,31 +32,57 @@ const moneyValue = {
 };
 const moneyKeys = Object.keys(moneyValue);
 const moneyValues = Object.values(moneyValue);
-const drawerStatus = {
-open: 'Status: Open',
+
+const statusMessages = {
+  'Open': 'Status: OPEN',
+  'Close': 'Status: CLOSED',
+  'Insufficient': 'Status: INSUFFICIENT_FUNDS',
+  'Client cannot pay': 'Customer does not have enough money to purchase the item',
+  'No change': 'No change due - customer paid with exact cash'
 };
 
 // look out for negative input!!
 const getUserInput = () => {
-  return costumerPaidWith = userInput.value;
+  costumerPaidWith = Number(userInput.value);
+}
+
+const checkTotalChange = () => {
+  totalChange = cid.reduce((totChange,change) => 
+    totChange = Math.round((totChange + change[1]) * 100) / 100, 0);
 }
 
 const calcFaceValue = () => {
-  const costumerPaidWith = getUserInput();
   let change = costumerPaidWith - price;
   const faceValues = [];
+  checkTotalChange();
+
   for(i = cid.length - 1; i >= 0; i--){
-    if(change >= moneyValues[i]){
+    if(change >= moneyValues[i] && cid[i][1] > 0 && totalChange >= change){
       change = Math.round((change - moneyValues[i]) * 100) / 100;
+      cid[i][1] = Math.round((cid[i][1] - moneyValues[i]) * 100) / 100;
       faceValues.push(moneyValues[i]);
       i++;
     } 
+  }
+
+  checkTotalChange();
+  if(change > totalChange){
+    drawerStatus = 'Insufficient';
+  } else if(costumerPaidWith < price){
+    drawerStatus = 'Client cannot pay';
+  } else if(costumerPaidWith === price){
+    drawerStatus = 'No change';
+  } else if(totalChange === 0){
+    drawerStatus = 'Close';
+  } else{
+    drawerStatus = 'Open';
   }
   return faceValues;
 }
 
 const addEqualFaceValues = () => {
   const faceValues = calcFaceValue();
+  console.log(faceValues);
   const change = faceValues.reduce((accumulator, faceValue) => {
     accumulator[faceValue] = (accumulator[faceValue] || 0) + faceValue;
     return accumulator;
@@ -64,6 +92,7 @@ const addEqualFaceValues = () => {
 
 const sortChange = () => {
   const change = addEqualFaceValues();
+  console.log(change);
   const sortedChange = Object.entries(change).toSorted(([a,], [b,]) => a - b);
   return sortedChange;
 }
@@ -86,9 +115,9 @@ const associateChange = () => {
 
 const printChange = () => {
   const namedChange = associateChange();
-  changeDue.innerHTML += `<div>${drawerStatus.open}</div>`;
+  changeDue.innerHTML = `<div>${statusMessages[drawerStatus]}</div>`;
   namedChange.forEach(element => {
-    changeDue.innerHTML += `<div>${element[0]}: ${element[1]}</div>`;
+    changeDue.innerHTML += `<div>${element[0]}: $${Math.round(element[1] * 100) / 100}</div>`;
   });
 }
 
@@ -104,24 +133,12 @@ const printCid = () => {
     }
 }
 
-const updateCid = () => {
-  const namedChange = associateChange();
-  namedChange.forEach(el => {
-    for(i = 0; i < cid.length; i++){
-      if(el[0] === cid[i][0]){
-        cid[i][1] = Math.round((cid[i][1] - el[1]) * 100) / 100;
-      }
-    }
-  })
-}
-
 printCid();
 
 purchaseBtn.addEventListener("click", () => {
   deleteData();
   getUserInput();
   printChange();
-  updateCid();
   printCid();
 })
 
