@@ -30,6 +30,9 @@ const moneyValue = {
 };
 const moneyKeys = Object.keys(moneyValue);
 const moneyValues = Object.values(moneyValue);
+const drawerStatus = {
+open: 'Status: Open',
+};
 
 // look out for negative input!!
 const getUserInput = () => {
@@ -38,13 +41,11 @@ const getUserInput = () => {
 
 const calcFaceValue = () => {
   const costumerPaidWith = getUserInput();
-  console.log(costumerPaidWith);
   let change = costumerPaidWith - price;
   const faceValues = [];
   for(i = cid.length - 1; i >= 0; i--){
     if(change >= moneyValues[i]){
       change = Math.round((change - moneyValues[i]) * 100) / 100;
-      console.log(change);
       faceValues.push(moneyValues[i]);
       i++;
     } 
@@ -85,6 +86,7 @@ const associateChange = () => {
 
 const printChange = () => {
   const namedChange = associateChange();
+  changeDue.innerHTML += `<div>${drawerStatus.open}</div>`;
   namedChange.forEach(element => {
     changeDue.innerHTML += `<div>${element[0]}: ${element[1]}</div>`;
   });
