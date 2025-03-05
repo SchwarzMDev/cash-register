@@ -36,11 +36,11 @@ const moneyKeys = Object.keys(denominations);
 const moneyValues = Object.values(denominations);
 
 const statusMessages = {
-  'Open': 'Status: OPEN',
-  'Close': 'Status: CLOSED',
-  'Insufficient': 'Status: INSUFFICIENT_FUNDS',
-  'Client cannot pay': 'Customer does not have enough money to purchase the item',
-  'No change': 'No change due - customer paid with exact cash'
+  open: 'Status: OPEN',
+  close: 'Status: CLOSED',
+  insufficientFunds: 'Status: INSUFFICIENT_FUNDS',
+  clientCanNotPay: 'Customer does not have enough money to purchase the item',
+  noChangeDue: 'No change due - customer paid with exact cash'
 };
 
 const getUserInput = () => {
@@ -89,19 +89,19 @@ const calcFaceValue = () => {
 
   checkTotalChange();
   if(change > totalChange || change > 0){
-    drawerStatus = 'Insufficient';
+    drawerStatus = 'insufficientFunds';
     return [];
   } else if(customerPaidWith < price){
-    drawerStatus = 'Client cannot pay';
+    drawerStatus = 'clientCanNotPay';
     return [];
   } else if(customerPaidWith === price){
-    drawerStatus = 'No change';
+    drawerStatus = 'noChangeDue';
     return [];
   } else if(totalChange === 0){
-    drawerStatus = 'Close';
+    drawerStatus = 'close';
     return faceValues;
   } else{
-    drawerStatus = 'Open';
+    drawerStatus = 'open';
     return faceValues;
   }
   
