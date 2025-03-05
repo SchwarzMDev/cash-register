@@ -4,8 +4,6 @@ const changeDue = document.querySelector("#change-due");
 const cashInDrawer = document.querySelector("#cid");
 
 let drawerStatus;
-let totalChange;
-let remainingChange;
 const price = 20;
 
 // cid = cash-in-drawer
@@ -60,35 +58,36 @@ const getUserInput = () => {
   }
 }
 
-const checkTotalChange = () => {
-  totalChange = cid.reduce((totChange,change) => 
-    totChange = Math.round((totChange + change[1]) * 100) / 100, 0);
-}
+const getRemainingCid = (remainingIndex) => {
+  let remainingCid = 0;
+  for(let i = remainingIndex; i >= 0; i--){
+    remainingCid = Math.round((remainingCid + cid[i][1]) * 100) / 100;
+  }
+  return remainingCid;
+};
 
-remainingChange = checkTotalChange();
-
-const calcFaceValue = () => {
+const getCustomerChange = () => {
   const customerPaidWith = getUserInput();
-  const remainingCid = cid.map(el => el);
+  const customerChange = [];
+  const cidLength = cid.length - 1;
+  let remainingCid = getRemainingCid(cidLength); 
   let change = Math.round((customerPaidWith - price) * 100) / 100;
-  const faceValues = [];
-  checkTotalChange();
 
-  for(let i = cid.length - 1; i >= 0; i--){
-    if(change >= moneyValues[i] && cid[i][1] > 0 && totalChange >= change && remainingChange >= change){
+  for(let i = cidLength; i >= 0; i--){
+    if(change >= moneyValues[i] 
+      && cid[i][1] > 0 
+      && getRemainingCid(cidLength) >= change 
+      && remainingCid >= change){
       change = Math.round((change - moneyValues[i]) * 100) / 100;
       cid[i][1] = Math.round((cid[i][1] - moneyValues[i]) * 100) / 100;
-      faceValues.push(moneyValues[i]);
+      customerChange.push(moneyValues[i]);
       i++;
     } else {
-      remainingCid.pop();
-      remainingChange = remainingCid.reduce((remChange,change) => 
-        remChange = Math.round((remChange + change[1]) * 100) / 100, 0);
+      remainingCid = getRemainingCid(i);
     }
   }
 
-  checkTotalChange();
-  if(change > totalChange || change > 0){
+  if(change > getRemainingCid(cidLength) || change > 0){
     drawerStatus = 'insufficientFunds';
     return [];
   } else if(customerPaidWith < price){
@@ -97,18 +96,18 @@ const calcFaceValue = () => {
   } else if(customerPaidWith === price){
     drawerStatus = 'noChangeDue';
     return [];
-  } else if(totalChange === 0){
+  } else if(getRemainingCid(cidLength) === 0){
     drawerStatus = 'close';
-    return faceValues;
+    return customerChange;
   } else{
     drawerStatus = 'open';
-    return faceValues;
+    return customerChange;
   }
   
 }
 
 const addEqualFaceValues = () => {
-  const faceValues = calcFaceValue();
+  const faceValues = getCustomerChange();
   const change = faceValues.reduce((accumulator, faceValue) => {
     accumulator[faceValue] = (accumulator[faceValue] || 0) + faceValue;
     return accumulator;
