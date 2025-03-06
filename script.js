@@ -66,6 +66,27 @@ const getRemainingCid = (remainingIndex) => {
   return remainingCid;
 };
 
+const checkDrawerStatus = (cidLength, customerPaidWith, change, customerChange) => {
+  const totalCid = getRemainingCid(cidLength);
+
+  if(change > totalCid || change > 0){
+    drawerStatus = 'insufficientFunds';
+    return [];
+  } else if(customerPaidWith < price){
+    drawerStatus = 'clientCanNotPay';
+    return [];
+  } else if(customerPaidWith === price){
+    drawerStatus = 'noChangeDue';
+    return [];
+  } else if(totalCid === 0){
+    drawerStatus = 'close';
+    return customerChange;
+  } else{
+    drawerStatus = 'open';
+    return customerChange;
+  }
+};
+
 const getCustomerChange = () => {
   const customerPaidWith = getUserInput();
   const customerChange = [];
@@ -85,25 +106,8 @@ const getCustomerChange = () => {
     } else {
       remainingCid = getRemainingCid(i);
     }
-  }
-
-  if(change > getRemainingCid(cidLength) || change > 0){
-    drawerStatus = 'insufficientFunds';
-    return [];
-  } else if(customerPaidWith < price){
-    drawerStatus = 'clientCanNotPay';
-    return [];
-  } else if(customerPaidWith === price){
-    drawerStatus = 'noChangeDue';
-    return [];
-  } else if(getRemainingCid(cidLength) === 0){
-    drawerStatus = 'close';
-    return customerChange;
-  } else{
-    drawerStatus = 'open';
-    return customerChange;
-  }
-  
+  }  
+  return checkDrawerStatus(cidLength, customerPaidWith, change, customerChange);
 }
 
 const addEqualFaceValues = () => {
