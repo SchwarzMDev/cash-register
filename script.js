@@ -3,7 +3,6 @@ const userInput = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due");
 const cashInDrawer = document.querySelector("#cid");
 
-let drawerStatus;
 const price = 20;
 
 // cid = cash-in-drawer
@@ -71,19 +70,19 @@ const checkDrawerStatus = (cidLength, customerPaidWith, change, customerChange) 
 
   if(change > totalCid || change > 0){
     drawerStatus = 'insufficientFunds';
-    return [];
+    return [[], drawerStatus];
   } else if(customerPaidWith < price){
     drawerStatus = 'clientCanNotPay';
-    return [];
+    return [[], drawerStatus];
   } else if(customerPaidWith === price){
     drawerStatus = 'noChangeDue';
-    return [];
+    return [[], drawerStatus];
   } else if(totalCid === 0){
     drawerStatus = 'close';
-    return customerChange;
+    return [customerChange, drawerStatus];
   } else{
     drawerStatus = 'open';
-    return customerChange;
+    return [customerChange, drawerStatus];
   }
 };
 
@@ -112,22 +111,22 @@ const getCustomerChange = () => {
 
 const addEqualFaceValues = () => {
   const faceValues = getCustomerChange();
-  const change = faceValues.reduce((accumulator, faceValue) => {
+  const change = faceValues[0].reduce((accumulator, faceValue) => {
     accumulator[faceValue] = (accumulator[faceValue] || 0) + faceValue;
     return accumulator;
   }, {});
-  return change;
+  return [change, faceValues[1]];
 }
 
 const sortChange = () => {
   const change = addEqualFaceValues();
-  const sortedChange = Object.entries(change).toSorted(([a,], [b,]) => b - a);
-  return sortedChange;
+  const sortedChange = Object.entries(change[0]).toSorted(([a,], [b,]) => b - a);
+  return [sortedChange, change[1]];
 }
 
 const associateChange = () => {
   const sortedChange = sortChange();
-  const namedChange = sortedChange.map((value) => {
+  const namedChange = sortedChange[0].map((value) => {
     const newArray = [];
     for(let i = 0; i < moneyValues.length; i++){
       if(value[0] === JSON.stringify(moneyValues[i])){
@@ -137,19 +136,19 @@ const associateChange = () => {
     }
     return newArray;
   })
-  return namedChange;
+  return [namedChange, sortedChange[1]];
 }
 
 const printChange = () => {
   const namedChange = associateChange();
+  const drawerStatus = namedChange[1];
   changeDue.innerHTML = `<div>${statusMessages[drawerStatus]}</div>`;
-  namedChange.forEach(element => {
-    changeDue.innerHTML += `<div>${element[0]}: $${Math.round(element[1] * 100) / 100}</div>`;
+  namedChange[0].forEach(element => {
+  changeDue.innerHTML += `<div>${element[0]}: $${Math.round(element[1] * 100) / 100}</div>`;
   });
 }
 
 const deleteData = () => {
-  //userInput.value = "";
   changeDue.innerHTML = ``;
   cashInDrawer.innerHTML = ``;
 }
@@ -159,8 +158,6 @@ const printCid = () => {
     cashInDrawer.innerHTML += `<div>${cid[i][0]}: ${cid[i][1]}</div>`;
     }
 }
-
-printCid();
 
 purchaseBtn.addEventListener("click", () => {
   deleteData();
